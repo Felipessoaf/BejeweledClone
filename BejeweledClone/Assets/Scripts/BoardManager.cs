@@ -7,8 +7,10 @@ public class BoardManager : MonoBehaviour
     [Header("References")]
     public GameObject GemPrefab;
 
-    private Gem[,] GemBoard;
+    public bool CanMove { get; private set; } = true;
+
     private Vector3[,] GemPos;
+    private Gem[,] GemBoard;
 
     private static BoardManager _instance;
 
@@ -50,7 +52,9 @@ public class BoardManager : MonoBehaviour
             for (int j = 0; j < 8; j++)
             {
                 Gem g = Instantiate(GemPrefab, transform).GetComponent<Gem>();
-                g.gameObject.name = "Gem[" + i + "," + j + "]";
+                //g.gameObject.name = "Gem[" + i + "," + j + "]";
+                g.Line = i;
+                g.Column = j;
 
                 Vector2 pos = new Vector2(j * diffX, - i * diffY);
                 g.transform.localPosition = pos;
@@ -63,5 +67,24 @@ public class BoardManager : MonoBehaviour
                 //print(g.transform.localPosition);
             }
         }
+    }
+
+    public void SwitchGems()
+    {
+        int tempLine, tempColumn;
+
+        //Store line and column on temp
+        tempLine = Gem.DraggedGem.Line;
+        tempColumn = Gem.DraggedGem.Column;
+
+        //switch positions ids
+        Gem.DraggedGem.Line = Gem.DropOnGem.Line;
+        Gem.DraggedGem.Column = Gem.DropOnGem.Column;
+        Gem.DropOnGem.Line = tempLine;
+        Gem.DropOnGem.Column = tempColumn;
+
+        //Update position
+        Gem.DraggedGem.transform.localPosition = BoardManager.GetInstance().GemPos[Gem.DraggedGem.Line, Gem.DraggedGem.Column];
+        Gem.DropOnGem.transform.localPosition = BoardManager.GetInstance().GemPos[Gem.DropOnGem.Line, Gem.DropOnGem.Column];
     }
 }
