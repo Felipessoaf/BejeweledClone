@@ -69,22 +69,44 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    public void SwitchGems()
+    public void CheckMove()
+    {
+        int diffLine = Mathf.Abs(Gem.DraggedGem.Line - Gem.DropOnGem.Line);
+        int diffCol = Mathf.Abs(Gem.DraggedGem.Column - Gem.DropOnGem.Column);
+
+        if (diffLine == 1 && diffCol == 0 || diffLine == 0 && diffCol == 1)
+        {
+            StartCoroutine(CheckMatch());
+        }
+    }
+
+    private IEnumerator CheckMatch()
+    {
+        SwitchGems();
+        yield return new WaitForSeconds(1);
+        SwitchGems(true);
+    }
+
+    private void SwitchGems(bool back = false)
     {
         int tempLine, tempColumn;
+        Gem from, to;
+
+        from = back ? Gem.DropOnGem : Gem.DraggedGem;
+        to = back ? Gem.DraggedGem : Gem.DropOnGem;
 
         //Store line and column on temp
-        tempLine = Gem.DraggedGem.Line;
-        tempColumn = Gem.DraggedGem.Column;
+        tempLine = from.Line;
+        tempColumn = from.Column;
 
         //switch positions ids
-        Gem.DraggedGem.Line = Gem.DropOnGem.Line;
-        Gem.DraggedGem.Column = Gem.DropOnGem.Column;
-        Gem.DropOnGem.Line = tempLine;
-        Gem.DropOnGem.Column = tempColumn;
+        from.Line = to.Line;
+        from.Column = to.Column;
+        to.Line = tempLine;
+        to.Column = tempColumn;
 
         //Update position
-        Gem.DraggedGem.transform.localPosition = BoardManager.GetInstance().GemPos[Gem.DraggedGem.Line, Gem.DraggedGem.Column];
-        Gem.DropOnGem.transform.localPosition = BoardManager.GetInstance().GemPos[Gem.DropOnGem.Line, Gem.DropOnGem.Column];
+        from.transform.localPosition = BoardManager.GetInstance().GemPos[from.Line, from.Column];
+        to.transform.localPosition = BoardManager.GetInstance().GemPos[to.Line, to.Column];
     }
 }

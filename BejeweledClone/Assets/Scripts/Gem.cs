@@ -42,7 +42,7 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
             //print("OnDrop: " + gameObject.name);
             DropOnGem = this;
 
-            BoardManager.GetInstance().SwitchGems();
+            BoardManager.GetInstance().CheckMove();
         }
     }
 
