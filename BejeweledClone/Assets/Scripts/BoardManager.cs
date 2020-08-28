@@ -7,8 +7,8 @@ public class BoardManager : MonoBehaviour
     [Header("References")]
     public GameObject GemPrefab;
 
-
     private Gem[,] GemBoard;
+    private Vector3[,] GemPos;
 
     private static BoardManager _instance;
 
@@ -31,11 +31,14 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
-        GenerateBoard();
+        GemBoard = new Gem[8,8];
+        GemPos = new Vector3[8, 8];
+        StartCoroutine(GenerateBoard());
     }
 
-    void GenerateBoard()
+    IEnumerator GenerateBoard()
     {
+        yield return new WaitForEndOfFrame();
         Rect rect = GetComponent<RectTransform>().rect;
         //print(rect);
 
@@ -52,9 +55,12 @@ public class BoardManager : MonoBehaviour
                 Vector2 pos = new Vector2(j * diffX, - i * diffY);
                 g.transform.localPosition = pos;
 
-                print("Gem[" + i + "," + j + "]");
-                print(pos);
-                print(g.transform.localPosition);
+                GemBoard[i, j] = g;
+                GemPos[i, j] = pos;
+
+                //print("Gem[" + i + "," + j + "]");
+                //print(pos);
+                //print(g.transform.localPosition);
             }
         }
     }
