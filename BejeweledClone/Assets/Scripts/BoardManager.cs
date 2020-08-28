@@ -71,24 +71,49 @@ public class BoardManager : MonoBehaviour
 
     public void CheckMove()
     {
+        StartCoroutine(CheckMoveCoroutine());
+    }
+
+    private IEnumerator CheckMoveCoroutine()
+    {
         int diffLine = Mathf.Abs(Gem.DraggedGem.Line - Gem.DropOnGem.Line);
         int diffCol = Mathf.Abs(Gem.DraggedGem.Column - Gem.DropOnGem.Column);
 
         if (diffLine == 1 && diffCol == 0 || diffLine == 0 && diffCol == 1)
         {
-            StartCoroutine(CheckMatch());
+            yield return StartCoroutine(StartCheckMatch());
         }
+
+        //Reset gems
+        Gem.DraggedGem = null;
+        Gem.DropOnGem = null;
     }
 
-    private IEnumerator CheckMatch()
+    private IEnumerator StartCheckMatch()
     {
-        SwitchGems();
+        CanMove = false;
+        yield return StartCoroutine(SwitchGems());
+
+        List<int> linesToCheck = new List<int>();
+        List<int> columnsToCheck = new List<int>();
+
+        //Add lines
+        Utils.AddListElemIfNotExists(linesToCheck, Gem.DraggedGem.Line);
+        Utils.AddListElemIfNotExists(linesToCheck, Gem.DropOnGem.Line);
+
+        //Add columns
+        Utils.AddListElemIfNotExists(columnsToCheck, Gem.DraggedGem.Column);
+        Utils.AddListElemIfNotExists(columnsToCheck, Gem.DropOnGem.Column);
+
         yield return new WaitForSeconds(1);
-        SwitchGems(true);
+        yield return StartCoroutine(SwitchGems(true));
+
+        CanMove = true;
     }
 
-    private void SwitchGems(bool back = false)
+    private IEnumerator SwitchGems(bool back = false)
     {
+        yield return new WaitForEndOfFrame();
         int tempLine, tempColumn;
         Gem from, to;
 

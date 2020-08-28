@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler, IEndDragHandler
+public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
     [Header("References")]
     public Sprite[] Sprites;
+    public GameObject SelectionBorder;
 
     public static Gem DraggedGem;
     public static Gem DropOnGem;
@@ -43,6 +44,25 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
             DropOnGem = this;
 
             BoardManager.GetInstance().CheckMove();
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (BoardManager.GetInstance().CanMove)
+        {
+            if(DraggedGem == null)
+            {
+                DraggedGem = this;
+                SelectionBorder.SetActive(true);
+            }
+            else
+            {
+                DraggedGem.SelectionBorder.SetActive(false);
+                DropOnGem = this;
+
+                BoardManager.GetInstance().CheckMove();
+            }
         }
     }
 
