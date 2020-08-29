@@ -11,6 +11,7 @@ public class BoardManager : MonoBehaviour
     public bool CanMove { get; private set; } = true;
 
     private Vector3[,] GemPos;
+    private Vector3[,] GemOutPos;
     private Gem[,] GemBoard;
 
     private int lineMax = 8, columnMax = 8;
@@ -38,6 +39,7 @@ public class BoardManager : MonoBehaviour
     {
         GemBoard = new Gem[lineMax, columnMax];
         GemPos = new Vector3[lineMax, columnMax];
+        GemOutPos = new Vector3[lineMax, columnMax];
         StartCoroutine(GenerateBoard());
     }
 
@@ -66,6 +68,7 @@ public class BoardManager : MonoBehaviour
 
                 GemBoard[i, j] = g;
                 GemPos[i, j] = pos;
+                GemOutPos[i, j] = pos + Vector2.up * rect.height;
 
                 g.GenerateId();
 
@@ -244,10 +247,9 @@ public class BoardManager : MonoBehaviour
 
             for (int i = 0; i < gemsToMove.Count; i++)
             {
-                //TODO:
-                //- move them above the board (maybe use another matrix to save positions outside?) (mask?) -> for same duration animations for all gems
                 gemsToMove[i].GenerateId();
                 gemsToMove[i].Line = gemsToMove[i].Line - gemsToMove.Count - firstGemLine;
+                gemsToMove[i].transform.localPosition = GemOutPos[gemsToMove[i].Line + lineMax, gemsToMove[i].Column];
             }
             
             //Adds gems above match (if any) to move down
@@ -264,22 +266,24 @@ public class BoardManager : MonoBehaviour
                 int line = g.Line + gemsDestroyed;
 
                 lastMove = StartCoroutine(MoveGem(g, line, g.Column));
-
-                //if (i == gemsToMove.Count - 1)
-                //{
-                //    yield return StartCoroutine(MoveGem(g, line, g.Column));
-                //}
-                //else
-                //{
-                //    lastMove = StartCoroutine(MoveGem(g, line, g.Column));
-                //}
             }
-            //yield return new WaitForSeconds(1);
         }
 
         yield return lastMove;
-        //yield return new WaitForSeconds(1);
-        print("finished!");
+
+        List<int> linesToCheck = new List<int>();
+        List<int> columnsToCheck = new List<int>();
+
+        for (int i = 0; i < lineMax; i++)
+        {
+            linesToCheck.Add(i);
+        }
+        for (int i = 0; i < columnMax; i++)
+        {
+            columnsToCheck.Add(i);
+        }
+
+        CheckMatch(linesToCheck, columnsToCheck, true);
     }
 
     private IEnumerator MoveGem(Gem gem, int line, int column)
@@ -288,6 +292,10 @@ public class BoardManager : MonoBehaviour
         gem.Line = line;
         gem.Column = column;
 
+        if (gem.Line > lineMax || gem.Column > columnMax || gem.Line < 0 || gem.Column < 0)
+        {
+            Debug.LogError("out of bounds");
+        }
         //Update GemBoard
         GemBoard[gem.Line, gem.Column] = gem;
 
