@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BoardManager : MonoBehaviour
 {
@@ -220,21 +221,57 @@ public class BoardManager : MonoBehaviour
     private IEnumerator DestroyGems(List<Gem> matchedGems)
     {
         yield return new WaitForEndOfFrame();
-        Dictionary<int, List<Gem>> gemsColumn = new Dictionary<int, List<Gem>>();
+        Dictionary<int, List<Gem>> gemsPerColumn = new Dictionary<int, List<Gem>>();
 
         foreach (var gem in matchedGems)
         {
             gem.gameObject.SetActive(false);
             
-            if(!gemsColumn.ContainsKey(gem.Column))
+            if(!gemsPerColumn.ContainsKey(gem.Column))
             {
-                gemsColumn.Add(gem.Column, new List<Gem>());
+                gemsPerColumn.Add(gem.Column, new List<Gem>());
             }
 
-            gemsColumn[gem.Column].Add(gem);
+            gemsPerColumn[gem.Column].Add(gem);
         }
 
+        foreach (var pair in gemsPerColumn)
+        {
+            List<Gem> gemsToMove = pair.Value.OrderBy(gem => gem.Line).ToList();
+            //print("Column: " + pair.Key);
+            int firstGemLine = gemsToMove[0].Line;
 
+            for (int i = 0; i < gemsToMove.Count; i++)
+            {
+                //TODO:
+                //- move them above the board (maybe use another matrix to save positions outside?) -> for same duration animations for all gems
+                //- set active true and generate gem id
+                gemsToMove[i].Line = gemsToMove[i].Line - gemsToMove.Count - firstGemLine;
+            }
+            
+            //Adds gems above match (if any) to move down
+            for (int i = 0; i < firstGemLine; i++)
+            {
+                gemsToMove.Add(GemBoard[i, pair.Key]);
+            }
+
+            //Moves gems down
+            for (int i = 0; i < gemsToMove.Count; i++)
+            {
+                Gem g = gemsToMove[i];
+                int gemsDestroyed = pair.Value.Count;
+                int line = g.Line + gemsDestroyed;
+
+                if (i == gemsToMove.Count - 1)
+                {
+                    yield return StartCoroutine(MoveGem(g, line, g.Column));
+                }
+                else
+                {
+                    StartCoroutine(MoveGem(g, line, g.Column));
+                }
+            }
+        }
     }
 
     private IEnumerator MoveGem(Gem gem, int line, int column)
