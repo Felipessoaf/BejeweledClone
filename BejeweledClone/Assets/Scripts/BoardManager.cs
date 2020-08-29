@@ -212,6 +212,7 @@ public class BoardManager : MonoBehaviour
 
         if (matchedGems.Count > 0)
         {
+            //TODO: yield return?
             StartCoroutine(DestroyGems(matchedGems));
         }
 
@@ -244,8 +245,9 @@ public class BoardManager : MonoBehaviour
             for (int i = 0; i < gemsToMove.Count; i++)
             {
                 //TODO:
-                //- move them above the board (maybe use another matrix to save positions outside?) -> for same duration animations for all gems
+                //- move them above the board (maybe use another matrix to save positions outside?) (mask?) -> for same duration animations for all gems
                 //- set active true and generate gem id
+                gemsToMove[i].GenerateId();
                 gemsToMove[i].Line = gemsToMove[i].Line - gemsToMove.Count - firstGemLine;
             }
             
@@ -284,8 +286,13 @@ public class BoardManager : MonoBehaviour
         GemBoard[gem.Line, gem.Column] = gem;
 
         //Update position
-        gem.transform.localPosition = GemPos[gem.Line, gem.Column];
-
-        yield return new WaitForSeconds(1);
+        float frac = 0.1f;
+        Vector3 initPos = gem.transform.localPosition;
+        while (frac <= 1)
+        {
+            frac += 0.05f;
+            yield return new WaitForSeconds(0.005f);
+            gem.transform.localPosition = Vector3.Lerp(initPos, GemPos[gem.Line, gem.Column], frac);
+        }
     }
 }

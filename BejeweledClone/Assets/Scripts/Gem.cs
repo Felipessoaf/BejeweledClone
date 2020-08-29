@@ -27,6 +27,7 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
 
         GemId = Random.Range(0, Sprites.Length);
         gemImage.sprite = Sprites[GemId];
+        gameObject.SetActive(true);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
