@@ -236,17 +236,16 @@ public class BoardManager : MonoBehaviour
             gemsPerColumn[gem.Column].Add(gem);
         }
 
+        Coroutine lastMove = null;
         foreach (var pair in gemsPerColumn)
         {
             List<Gem> gemsToMove = pair.Value.OrderBy(gem => gem.Line).ToList();
-            //print("Column: " + pair.Key);
             int firstGemLine = gemsToMove[0].Line;
 
             for (int i = 0; i < gemsToMove.Count; i++)
             {
                 //TODO:
                 //- move them above the board (maybe use another matrix to save positions outside?) (mask?) -> for same duration animations for all gems
-                //- set active true and generate gem id
                 gemsToMove[i].GenerateId();
                 gemsToMove[i].Line = gemsToMove[i].Line - gemsToMove.Count - firstGemLine;
             }
@@ -264,16 +263,23 @@ public class BoardManager : MonoBehaviour
                 int gemsDestroyed = pair.Value.Count;
                 int line = g.Line + gemsDestroyed;
 
-                if (i == gemsToMove.Count - 1)
-                {
-                    yield return StartCoroutine(MoveGem(g, line, g.Column));
-                }
-                else
-                {
-                    StartCoroutine(MoveGem(g, line, g.Column));
-                }
+                lastMove = StartCoroutine(MoveGem(g, line, g.Column));
+
+                //if (i == gemsToMove.Count - 1)
+                //{
+                //    yield return StartCoroutine(MoveGem(g, line, g.Column));
+                //}
+                //else
+                //{
+                //    lastMove = StartCoroutine(MoveGem(g, line, g.Column));
+                //}
             }
+            //yield return new WaitForSeconds(1);
         }
+
+        yield return lastMove;
+        //yield return new WaitForSeconds(1);
+        print("finished!");
     }
 
     private IEnumerator MoveGem(Gem gem, int line, int column)
