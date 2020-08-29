@@ -14,17 +14,19 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     public static Gem DropOnGem;
 
     public int Line, Column;
+    public int GemId { get; private set; }
 
     private Image gemImage;
 
-    private int gemId;
-
-    void Start()
+    public void GenerateId()
     {
-        gemImage = GetComponentInChildren<Image>();
+        if(gemImage == null)
+        {
+            gemImage = GetComponentInChildren<Image>();
+        }
 
-        gemId = Random.Range(0, Sprites.Length);
-        gemImage.sprite = Sprites[gemId];
+        GemId = Random.Range(0, Sprites.Length);
+        gemImage.sprite = Sprites[GemId];
     }
 
     public void OnBeginDrag(PointerEventData eventData)

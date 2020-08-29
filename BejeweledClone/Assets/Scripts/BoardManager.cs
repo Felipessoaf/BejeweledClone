@@ -12,6 +12,8 @@ public class BoardManager : MonoBehaviour
     private Vector3[,] GemPos;
     private Gem[,] GemBoard;
 
+    private int lineMax = 8, columnMax = 8;
+
     private static BoardManager _instance;
 
     public static BoardManager GetInstance()
@@ -33,8 +35,8 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
-        GemBoard = new Gem[8,8];
-        GemPos = new Vector3[8, 8];
+        GemBoard = new Gem[lineMax, columnMax];
+        GemPos = new Vector3[lineMax, columnMax];
         StartCoroutine(GenerateBoard());
     }
 
@@ -42,14 +44,16 @@ public class BoardManager : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         Rect rect = GetComponent<RectTransform>().rect;
-        //print(rect);
 
-        float diffX = rect.width/8;
-        float diffY = rect.height/8;
+        float diffX = rect.width/ lineMax;
+        float diffY = rect.height/ columnMax;
 
-        for (int i = 0; i < 8; i++)
+        List<int> linesToCheck = new List<int>();
+        List<int> columnsToCheck = new List<int>();
+
+        for (int i = 0; i < lineMax; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < columnMax; j++)
             {
                 Gem g = Instantiate(GemPrefab, transform).GetComponent<Gem>();
                 //g.gameObject.name = "Gem[" + i + "," + j + "]";
@@ -62,11 +66,29 @@ public class BoardManager : MonoBehaviour
                 GemBoard[i, j] = g;
                 GemPos[i, j] = pos;
 
+                g.GenerateId();
+
                 //print("Gem[" + i + "," + j + "]");
                 //print(pos);
                 //print(g.transform.localPosition);
+
+                columnsToCheck.Add(j);
             }
+            linesToCheck.Add(i);
         }
+
+        //Check Matches
+        List<Gem> matchedGems = CheckMatch(linesToCheck, columnsToCheck, true);
+
+        //if (matchedGems.Count > 0)
+        //{
+        //    //print("gerando novo board");
+        //    //StartCoroutine(GenerateBoard());
+        //    foreach (var gem in matchedGems)
+        //    {
+        //        gem.gameObject.SetActive(false);
+        //    }
+        //}
     }
 
     public void CheckMove()
@@ -81,7 +103,7 @@ public class BoardManager : MonoBehaviour
 
         if (diffLine == 1 && diffCol == 0 || diffLine == 0 && diffCol == 1)
         {
-            yield return StartCoroutine(StartCheckMatch());
+            yield return StartCoroutine(StartCheckMoveMatch());
         }
 
         //Reset gems
@@ -89,10 +111,16 @@ public class BoardManager : MonoBehaviour
         Gem.DropOnGem = null;
     }
 
-    private IEnumerator StartCheckMatch()
+    private IEnumerator StartCheckMoveMatch()
     {
         CanMove = false;
-        yield return StartCoroutine(SwitchGems());
+
+        //Switch gems
+        int tempLine = Gem.DraggedGem.Line;
+        int tempColumn = Gem.DraggedGem.Column;
+
+        StartCoroutine(MoveGem(Gem.DraggedGem, Gem.DropOnGem.Line, Gem.DropOnGem.Column));
+        yield return StartCoroutine(MoveGem(Gem.DropOnGem, tempLine, tempColumn));
 
         List<int> linesToCheck = new List<int>();
         List<int> columnsToCheck = new List<int>();
@@ -105,33 +133,122 @@ public class BoardManager : MonoBehaviour
         Utils.AddListElemIfNotExists(columnsToCheck, Gem.DraggedGem.Column);
         Utils.AddListElemIfNotExists(columnsToCheck, Gem.DropOnGem.Column);
 
-        yield return new WaitForSeconds(1);
-        yield return StartCoroutine(SwitchGems(true));
+        //Check Matches
+        List<Gem> matchedGems = CheckMatch(linesToCheck, columnsToCheck, true);
+
+        if (matchedGems.Count == 0)
+        {
+            //Undo move
+            tempLine = Gem.DraggedGem.Line;
+            tempColumn = Gem.DraggedGem.Column;
+
+            StartCoroutine(MoveGem(Gem.DraggedGem, Gem.DropOnGem.Line, Gem.DropOnGem.Column));
+            yield return StartCoroutine(MoveGem(Gem.DropOnGem, tempLine, tempColumn));
+        }
 
         CanMove = true;
     }
 
-    private IEnumerator SwitchGems(bool back = false)
+    private List<Gem> CheckMatch(List<int> linesToCheck, List<int> columnsToCheck, bool destroyGems)
+    {
+        List<Gem> matchedGems = new List<Gem>();
+
+        //Lines
+        foreach (var line in linesToCheck)
+        {
+            List<Gem> possibleMatch = new List<Gem>();
+            for (int i = 0; i < columnMax; i++)
+            {
+                Gem current = GemBoard[line, i];
+                Gem next = (i < columnMax - 1) ? GemBoard[line, i + 1] : null;
+
+                if (next && current.GemId == next.GemId)
+                {
+                    Utils.AddListElemIfNotExists(possibleMatch, current);
+                    Utils.AddListElemIfNotExists(possibleMatch, next);
+                }
+                else
+                {
+                    if (possibleMatch.Count >= 3)
+                    {
+                        foreach (var gem in possibleMatch)
+                        {
+                            Utils.AddListElemIfNotExists(matchedGems, gem);
+                        }
+                    }
+                    possibleMatch.Clear();
+                }
+            }
+        }
+
+        //Columns
+        foreach (var column in columnsToCheck)
+        {
+            List<Gem> possibleMatch = new List<Gem>();
+            for (int i = lineMax - 1; i >= 0; i--)
+            {
+                Gem current = GemBoard[i, column];
+                Gem next = (i > 0) ? GemBoard[i - 1, column] : null;
+
+                if (next && current.GemId == next.GemId)
+                {
+                    Utils.AddListElemIfNotExists(possibleMatch, current);
+                    Utils.AddListElemIfNotExists(possibleMatch, next);
+                }
+                else
+                {
+                    if (possibleMatch.Count >= 3)
+                    {
+                        foreach (var gem in possibleMatch)
+                        {
+                            Utils.AddListElemIfNotExists(matchedGems, gem);
+                        }
+                    }
+                    possibleMatch.Clear();
+                }
+            }
+        }
+
+        if (matchedGems.Count > 0)
+        {
+            StartCoroutine(DestroyGems(matchedGems));
+        }
+
+        return matchedGems;
+    }
+
+    private IEnumerator DestroyGems(List<Gem> matchedGems)
     {
         yield return new WaitForEndOfFrame();
-        int tempLine, tempColumn;
-        Gem from, to;
+        Dictionary<int, List<Gem>> gemsColumn = new Dictionary<int, List<Gem>>();
 
-        from = back ? Gem.DropOnGem : Gem.DraggedGem;
-        to = back ? Gem.DraggedGem : Gem.DropOnGem;
+        foreach (var gem in matchedGems)
+        {
+            gem.gameObject.SetActive(false);
+            
+            if(!gemsColumn.ContainsKey(gem.Column))
+            {
+                gemsColumn.Add(gem.Column, new List<Gem>());
+            }
 
-        //Store line and column on temp
-        tempLine = from.Line;
-        tempColumn = from.Column;
+            gemsColumn[gem.Column].Add(gem);
+        }
 
-        //switch positions ids
-        from.Line = to.Line;
-        from.Column = to.Column;
-        to.Line = tempLine;
-        to.Column = tempColumn;
+
+    }
+
+    private IEnumerator MoveGem(Gem gem, int line, int column)
+    {
+        //Switch positions ids
+        gem.Line = line;
+        gem.Column = column;
+
+        //Update GemBoard
+        GemBoard[gem.Line, gem.Column] = gem;
 
         //Update position
-        from.transform.localPosition = BoardManager.GetInstance().GemPos[from.Line, from.Column];
-        to.transform.localPosition = BoardManager.GetInstance().GemPos[to.Line, to.Column];
+        gem.transform.localPosition = GemPos[gem.Line, gem.Column];
+
+        yield return new WaitForSeconds(1);
     }
 }
