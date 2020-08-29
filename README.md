@@ -1,6 +1,6 @@
 # BejeweledClone
 
-Clone do jogo Bejewled
+Clone do jogo Bejeweled
 
 Assets usados:
 
