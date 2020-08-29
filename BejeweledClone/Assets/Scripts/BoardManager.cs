@@ -5,6 +5,7 @@ using System.Linq;
 
 public class BoardManager : MonoBehaviour
 {
+    #region Variables
     [Header("References")]
     public GameObject GemPrefab;
 
@@ -17,12 +18,14 @@ public class BoardManager : MonoBehaviour
     private int lineMax = 8, columnMax = 8;
 
     private static BoardManager _instance;
+    #endregion
 
     public static BoardManager GetInstance()
     {
         return _instance;
     }
 
+    #region Unity methods
     void Awake()
     {
         if(_instance == null)
@@ -42,6 +45,7 @@ public class BoardManager : MonoBehaviour
         GemOutPos = new Vector3[lineMax, columnMax];
         StartCoroutine(GenerateBoard());
     }
+    #endregion
 
     IEnumerator GenerateBoard()
     {
@@ -72,10 +76,6 @@ public class BoardManager : MonoBehaviour
 
                 g.GenerateId();
 
-                //print("Gem[" + i + "," + j + "]");
-                //print(pos);
-                //print(g.transform.localPosition);
-
                 columnsToCheck.Add(j);
             }
             linesToCheck.Add(i);
@@ -83,16 +83,6 @@ public class BoardManager : MonoBehaviour
 
         //Check Matches
         List<Gem> matchedGems = CheckMatch(linesToCheck, columnsToCheck, true);
-
-        //if (matchedGems.Count > 0)
-        //{
-        //    //print("gerando novo board");
-        //    //StartCoroutine(GenerateBoard());
-        //    foreach (var gem in matchedGems)
-        //    {
-        //        gem.gameObject.SetActive(false);
-        //    }
-        //}
     }
 
     public void CheckMove()
