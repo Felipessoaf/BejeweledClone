@@ -38,18 +38,38 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    void Start()
+    private void OnEnable()
+    {
+        GameManager.StartGameDelegate += SetupBoard;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.StartGameDelegate -= SetupBoard;
+    }
+    #endregion
+
+    private void SetupBoard()
     {
         GemBoard = new Gem[lineMax, columnMax];
         GemPos = new Vector3[lineMax, columnMax];
         GemOutPos = new Vector3[lineMax, columnMax];
         StartCoroutine(GenerateBoard());
     }
-    #endregion
 
     IEnumerator GenerateBoard()
     {
+        //Wait one frame so that rect value is correct
         yield return new WaitForEndOfFrame();
+
+        if(transform.childCount > 0)
+        {
+            for (int i = transform.childCount-1; i >= 0; i--)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
+        }
+
         Rect rect = GetComponent<RectTransform>().rect;
 
         float diffX = rect.width/ lineMax;

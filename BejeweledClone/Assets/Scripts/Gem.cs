@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
+    #region Variables
     [Header("References")]
     public Sprite[] Sprites;
     public GameObject SelectionBorder;
@@ -17,6 +18,7 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     public int GemId { get; private set; }
 
     private Image gemImage;
+    #endregion
 
     public void GenerateId()
     {
@@ -30,11 +32,11 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
         gameObject.SetActive(true);
     }
 
+    #region MainHandlers
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (BoardManager.GetInstance().CanMove)
         {
-            //print("OnBeginDrag: " + gameObject.name);
             DraggedGem = this;
         }
     }
@@ -43,7 +45,6 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     {
         if (BoardManager.GetInstance().CanMove)
         {
-            //print("OnDrop: " + gameObject.name);
             DropOnGem = this;
 
             BoardManager.GetInstance().CheckMove();
@@ -68,7 +69,9 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
             }
         }
     }
+    #endregion
 
+    #region OtherHandlers
     public void OnEndDrag(PointerEventData eventData)
     {
         //print("OnEndDrag: " + gameObject.name);
@@ -78,4 +81,5 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     {
         //print("OnDrag: " + gameObject.name);
     }
+    #endregion
 }
