@@ -57,7 +57,7 @@ public class BoardManager : MonoBehaviour
     private void OnLevelUpdate(int level)
     {
         //TODO: some animation?
-        SetupBoard();
+        //SetupBoard();
     }
 
     private void OnPointsText(Vector3 pos, int points)
@@ -119,8 +119,19 @@ public class BoardManager : MonoBehaviour
             linesToCheck.Add(i);
         }
 
-        //Check Matches
-        StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
+        //Check if there are any possible moves
+        if(CheckForPossibleMoves())
+        {
+            //Check Matches
+            StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
+        }
+    }
+
+    private bool CheckForPossibleMoves()
+    {
+        //TODO: implement this
+        Debug.LogWarning("not implemented");
+        return true;
     }
 
     public void CheckMove()
@@ -179,6 +190,12 @@ public class BoardManager : MonoBehaviour
 
             StartCoroutine(MoveGem(Gem.DraggedGem, Gem.DropOnGem.Line, Gem.DropOnGem.Column));
             yield return StartCoroutine(MoveGem(Gem.DropOnGem, tempLine, tempColumn));
+        }
+
+        //Check if there are any possible moves
+        if(!CheckForPossibleMoves())
+        {
+            //TODO: game over
         }
 
         CanMove = true;
@@ -253,9 +270,8 @@ public class BoardManager : MonoBehaviour
 
         if (matchedGems.Count > 0)
         {
-            yield return StartCoroutine(DestroyGems(matchedGems));
-
             GameManager.GetInstance().AddScore(matchCombos);
+            yield return StartCoroutine(DestroyGems(matchedGems));
         }
 
         callback?.Invoke(matchedGems);
@@ -337,11 +353,6 @@ public class BoardManager : MonoBehaviour
 
     private IEnumerator MoveGem(Gem gem, int line, int column)
     {
-        if (line >= lineMax || column >= columnMax || line < 0 || column < 0)
-        {
-            Debug.LogError("out of bounds");
-        }
-
         //Switch positions ids
         gem.Line = line;
         gem.Column = column;
@@ -350,6 +361,7 @@ public class BoardManager : MonoBehaviour
         GemBoard[gem.Line, gem.Column] = gem;
 
         //Update position
+        //TODO: make this work based on time
         float frac = 0.1f;
         Vector3 initPos = gem.transform.localPosition;
         while (frac <= 1)
