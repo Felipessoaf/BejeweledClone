@@ -9,6 +9,7 @@ public class SideMenu : MonoBehaviour
     #region Variables
     [Header("References")]
     public TMP_Text ScoreText;
+    public TMP_Text LastScoreUpdateText;
 
     public Button NewGameButton;
     public Button QuitGameButton;
@@ -42,8 +43,9 @@ public class SideMenu : MonoBehaviour
         Application.Quit();
     }
 
-    private void OnScoreUpdate(int score)
+    private void OnScoreUpdate(int score, int scoreUpdate)
     {
         ScoreText.text = "Score: " + score;
+        LastScoreUpdateText.text = "+" + scoreUpdate;
     }
 }

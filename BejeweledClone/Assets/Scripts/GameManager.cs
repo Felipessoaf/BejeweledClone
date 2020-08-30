@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public delegate void OnStartGame();
     public static OnStartGame StartGameDelegate;
 
-    public delegate void OnScoreUpdate(int score);
+    public delegate void OnScoreUpdate(int score, int scoreUpdate);
     public static OnScoreUpdate ScoreUpdateDelegate;
 
     public delegate void OnProgressUpdate(float progress);
@@ -68,17 +68,27 @@ public class GameManager : MonoBehaviour
         score = 0;
         currentLevel = 1;
         previousLevelPoints = 0;
-        nextLevelPoints = 40;
+        nextLevelPoints = 200;
 
-        ScoreUpdateDelegate?.Invoke(score);
+        ScoreUpdateDelegate?.Invoke(score, 0);
         ProgressUpdateDelegate?.Invoke(0);
     }
 
-    public void AddScore(int val)
+    public void AddScore(List<int> combos)
     {
+        //Update score: gemComboPoints = base + base*gemsOver3 + base*comboIndex
+        //base: how much one simple 3 match is worth based on current level
+        //gemsOver3: total gems - 3, I.E. matches with more than 3 gems generates more points
+        //comboIndex: the "index" of that match if more than one match was made 
+        int comboScore = 0;
+        for (int i = 0; i < combos.Count; i++)
+        {
+            comboScore += baseMatchPoints*(1 + (combos[i]-3) + i);
+        }
+
         //Update score
-        score += val;
-        ScoreUpdateDelegate?.Invoke(score);
+        score += comboScore;
+        ScoreUpdateDelegate?.Invoke(score, comboScore);
 
         //Update progress
         float progress = (float)(score - previousLevelPoints)/(nextLevelPoints - previousLevelPoints);
@@ -87,7 +97,9 @@ public class GameManager : MonoBehaviour
         //Update Level
         if(progress >= 1)
         {
+            //Update values
             currentLevel++;
+            baseMatchPoints += 10;
             previousLevelPoints = nextLevelPoints;
             nextLevelPoints += 200;
 
