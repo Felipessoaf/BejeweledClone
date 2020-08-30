@@ -41,13 +41,21 @@ public class BoardManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.StartGameDelegate += SetupBoard;
+        GameManager.LevelUpdateDelegate += OnLevelUpdate;
     }
 
     private void OnDisable()
     {
         GameManager.StartGameDelegate -= SetupBoard;
+        GameManager.LevelUpdateDelegate -= OnLevelUpdate;
     }
     #endregion
+
+    private void OnLevelUpdate(int level)
+    {
+        //TODO: some animation?
+        SetupBoard();
+    }
 
     private void SetupBoard()
     {
@@ -102,7 +110,7 @@ public class BoardManager : MonoBehaviour
         }
 
         //Check Matches
-        List<Gem> matchedGems = CheckMatch(linesToCheck, columnsToCheck, true);
+        StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
     }
 
     public void CheckMove()
@@ -148,7 +156,10 @@ public class BoardManager : MonoBehaviour
         Utils.AddListElemIfNotExists(columnsToCheck, Gem.DropOnGem.Column);
 
         //Check Matches
-        List<Gem> matchedGems = CheckMatch(linesToCheck, columnsToCheck, true);
+        List<Gem> matchedGems = new List<Gem>();
+        yield return StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, list => {
+            matchedGems = list;
+        }));
 
         if (matchedGems.Count == 0)
         {
@@ -163,7 +174,7 @@ public class BoardManager : MonoBehaviour
         CanMove = true;
     }
 
-    private List<Gem> CheckMatch(List<int> linesToCheck, List<int> columnsToCheck, bool destroyGems)
+    private IEnumerator CheckMatch(List<int> linesToCheck, List<int> columnsToCheck, bool destroyGems, System.Action<List<Gem>> callback)
     {
         List<Gem> matchedGems = new List<Gem>();
 
@@ -225,11 +236,15 @@ public class BoardManager : MonoBehaviour
 
         if (matchedGems.Count > 0)
         {
-            //TODO: yield return?
-            StartCoroutine(DestroyGems(matchedGems));
+            //Update score: gemComboPoints = base + base*gemsOver3 + comboIndex
+            //base: how much one simple 3 match is worth based on current level
+            //gemsOver3: total gems - 3, I.E. matches with more than 3 gems generates more points
+            //comboIndex: the "index" of that match if more than one match was made 
+            yield return StartCoroutine(DestroyGems(matchedGems));
+            GameManager.GetInstance().AddScore(matchedGems.Count);
         }
 
-        return matchedGems;
+        callback?.Invoke(matchedGems);
     }
 
     private IEnumerator DestroyGems(List<Gem> matchedGems)
@@ -293,7 +308,7 @@ public class BoardManager : MonoBehaviour
             columnsToCheck.Add(i);
         }
 
-        CheckMatch(linesToCheck, columnsToCheck, true);
+        yield return StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
     }
 
     private IEnumerator MoveGem(Gem gem, int line, int column)

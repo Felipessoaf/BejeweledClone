@@ -17,12 +17,33 @@ public class SideMenu : MonoBehaviour
     #region Unity methods
     void Start()
     {
-        NewGameButton.onClick.AddListener(OnStartGame);
+        NewGameButton.onClick.AddListener(StartGame);
+        NewGameButton.onClick.AddListener(QuitGame);
+    }
+
+    private void OnEnable()
+    {
+        GameManager.ScoreUpdateDelegate += OnScoreUpdate;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.ScoreUpdateDelegate -= OnScoreUpdate;
     }
     #endregion
 
-    private void OnStartGame()
+    private void StartGame()
     {
         GameManager.StartGameDelegate?.Invoke();
+    }
+
+    private void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    private void OnScoreUpdate(int score)
+    {
+        ScoreText.text = "Score: " + score;
     }
 }
