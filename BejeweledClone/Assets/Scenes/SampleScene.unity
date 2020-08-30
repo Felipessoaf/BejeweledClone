@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.17254902, g: 0.24313727, b: 0.3137255, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -231,6 +231,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GemPrefab: {fileID: 6541647977257589177, guid: 86e90c07199901445a913ff5881c50e2,
+    type: 3}
+  PointsTextPrefab: {fileID: 9033113933358053971, guid: 748ad59691faa184fa27dbd5d139e405,
     type: 3}
 --- !u!114 &91133957
 MonoBehaviour:

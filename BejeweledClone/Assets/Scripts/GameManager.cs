@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
 
     public delegate void OnLevelUpdate(int level);
     public static OnLevelUpdate LevelUpdateDelegate;
+
+    public delegate void OnPointsText(Vector3 pos, int points);
+    public static OnPointsText PointsTextDelegate;
     #endregion
 
     #region Variables
@@ -74,7 +77,7 @@ public class GameManager : MonoBehaviour
         ProgressUpdateDelegate?.Invoke(0);
     }
 
-    public void AddScore(List<int> combos)
+    public void AddScore(List<List<Gem>> combos)
     {
         //Update score: gemComboPoints = base + base*gemsOver3 + base*comboIndex
         //base: how much one simple 3 match is worth based on current level
@@ -83,7 +86,9 @@ public class GameManager : MonoBehaviour
         int comboScore = 0;
         for (int i = 0; i < combos.Count; i++)
         {
-            comboScore += baseMatchPoints*(1 + (combos[i]-3) + i);
+            comboScore += baseMatchPoints*(1 + (combos[i].Count-3) + i);
+
+            PointsTextDelegate?.Invoke(combos[i][combos[i].Count / 2].transform.position, comboScore);
         }
 
         //Update score

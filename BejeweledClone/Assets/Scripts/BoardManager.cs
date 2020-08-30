@@ -8,6 +8,7 @@ public class BoardManager : MonoBehaviour
     #region Variables
     [Header("References")]
     public GameObject GemPrefab;
+    public GameObject PointsTextPrefab;
 
     public bool CanMove { get; private set; } = true;
 
@@ -42,12 +43,14 @@ public class BoardManager : MonoBehaviour
     {
         GameManager.StartGameDelegate += SetupBoard;
         GameManager.LevelUpdateDelegate += OnLevelUpdate;
+        GameManager.PointsTextDelegate += OnPointsText;
     }
 
     private void OnDisable()
     {
         GameManager.StartGameDelegate -= SetupBoard;
         GameManager.LevelUpdateDelegate -= OnLevelUpdate;
+        GameManager.PointsTextDelegate -= OnPointsText;
     }
     #endregion
 
@@ -55,6 +58,13 @@ public class BoardManager : MonoBehaviour
     {
         //TODO: some animation?
         SetupBoard();
+    }
+
+    private void OnPointsText(Vector3 pos, int points)
+    {
+        //Instantiate the points text prefab close to the middle of the combo
+        PointsText pt = Instantiate(PointsTextPrefab, pos, PointsTextPrefab.transform.rotation, transform).GetComponent<PointsText>();
+        pt.SetText(points);
     }
 
     private void SetupBoard()
@@ -177,7 +187,7 @@ public class BoardManager : MonoBehaviour
     private IEnumerator CheckMatch(List<int> linesToCheck, List<int> columnsToCheck, bool destroyGems, System.Action<List<Gem>> callback)
     {
         List<Gem> matchedGems = new List<Gem>();
-        List<int> matchCombos = new List<int>();
+        List<List<Gem>> matchCombos = new List<List<Gem>>();
 
         //TODO: simplify line/column same code
 
@@ -204,7 +214,7 @@ public class BoardManager : MonoBehaviour
                             Utils.AddListElemIfNotExists(matchedGems, gem);
                         }
                         //Store each match separately to count the points
-                        matchCombos.Add(possibleMatch.Count);
+                        matchCombos.Add(possibleMatch.ToList());
                     }
                     possibleMatch.Clear();
                 }
@@ -234,7 +244,7 @@ public class BoardManager : MonoBehaviour
                             Utils.AddListElemIfNotExists(matchedGems, gem);
                         }
                         //Store each match separately to count the points
-                        matchCombos.Add(possibleMatch.Count);
+                        matchCombos.Add(possibleMatch.ToList());
                     }
                     possibleMatch.Clear();
                 }
@@ -271,34 +281,44 @@ public class BoardManager : MonoBehaviour
         Coroutine lastMove = null;
         foreach (var pair in gemsPerColumn)
         {
-            List<Gem> gemsToMove = pair.Value.OrderBy(gem => gem.Line).ToList();
-            int firstGemLine = gemsToMove[0].Line;
+            List<Gem> gemsMatched = pair.Value.OrderBy(gem => gem.Line).ToList();
+            List<int> gemsMatchedLines = pair.Value.Select(gem => gem.Line).ToList();
+            List<Gem> gemsToMove = new List<Gem>();
 
-            for (int i = 0; i < gemsToMove.Count; i++)
+            int negativeCount = -1;
+            int gemsCount = 0;
+            for (int i = lineMax-1; i >= 0; i--)
             {
-                gemsToMove[i].GenerateId();
-                gemsToMove[i].Line = gemsToMove[i].Line - gemsToMove.Count - firstGemLine;
-                gemsToMove[i].transform.localPosition = GemOutPos[gemsToMove[i].Line + lineMax, gemsToMove[i].Column];
-            }
-            
-            //Adds gems above match (if any) to move down
-            for (int i = 0; i < firstGemLine; i++)
-            {
-                gemsToMove.Add(GemBoard[i, pair.Key]);
+                if(gemsMatchedLines.Contains(i))
+                {
+                    gemsMatched[gemsCount].GenerateId();
+
+                    //Gets the position from the matrix above the board
+                    gemsMatched[gemsCount].transform.localPosition = GemOutPos[negativeCount + lineMax, gemsMatched[gemsCount].Column];
+                    gemsMatched[gemsCount].Line = gemsCount;
+
+                    gemsToMove.Add(gemsMatched[gemsCount]);
+
+                    //Update values
+                    negativeCount--;
+                    gemsCount++;
+                }
+                else
+                {
+                    GemBoard[i, pair.Key].Line += gemsCount;
+                    gemsToMove.Add(GemBoard[i, pair.Key]);
+                }
             }
 
             //Moves gems down
-            for (int i = 0; i < gemsToMove.Count; i++)
+            foreach (var gem in gemsToMove)
             {
-                Gem g = gemsToMove[i];
-                int gemsDestroyed = pair.Value.Count;
-                int line = g.Line + gemsDestroyed;
-
-                lastMove = StartCoroutine(MoveGem(g, line, g.Column));
+                lastMove = StartCoroutine(MoveGem(gem, gem.Line, gem.Column));
             }
         }
 
         yield return lastMove;
+        print("finished moving");
 
         List<int> linesToCheck = new List<int>();
         List<int> columnsToCheck = new List<int>();
@@ -317,14 +337,15 @@ public class BoardManager : MonoBehaviour
 
     private IEnumerator MoveGem(Gem gem, int line, int column)
     {
+        if (line >= lineMax || column >= columnMax || line < 0 || column < 0)
+        {
+            Debug.LogError("out of bounds");
+        }
+
         //Switch positions ids
         gem.Line = line;
         gem.Column = column;
 
-        if (gem.Line > lineMax || gem.Column > columnMax || gem.Line < 0 || gem.Column < 0)
-        {
-            Debug.LogError("out of bounds");
-        }
         //Update GemBoard
         GemBoard[gem.Line, gem.Column] = gem;
 
@@ -333,7 +354,7 @@ public class BoardManager : MonoBehaviour
         Vector3 initPos = gem.transform.localPosition;
         while (frac <= 1)
         {
-            frac += 0.05f;
+            frac += 0.005f;
             yield return new WaitForSeconds(0.005f);
             gem.transform.localPosition = Vector3.Lerp(initPos, GemPos[gem.Line, gem.Column], frac);
         }
