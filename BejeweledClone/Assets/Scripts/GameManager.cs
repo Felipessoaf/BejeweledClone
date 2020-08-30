@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
         score = 0;
         currentLevel = 1;
         previousLevelPoints = 0;
-        nextLevelPoints = 200;
+        nextLevelPoints = 1000;
 
         ScoreUpdateDelegate?.Invoke(score, 0);
         ProgressUpdateDelegate?.Invoke(0);
@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
             currentLevel++;
             baseMatchPoints += 10;
             previousLevelPoints = nextLevelPoints;
-            nextLevelPoints += 200;
+            nextLevelPoints += 1000;
 
             ProgressUpdateDelegate?.Invoke(0);
             LevelUpdateDelegate?.Invoke(currentLevel);

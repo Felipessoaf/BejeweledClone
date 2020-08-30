@@ -311,7 +311,7 @@ public class BoardManager : MonoBehaviour
 
                     //Gets the position from the matrix above the board
                     gemsMatched[gemsCount].transform.localPosition = GemOutPos[negativeCount + lineMax, gemsMatched[gemsCount].Column];
-                    gemsMatched[gemsCount].Line = gemsCount;
+                    gemsMatched[gemsCount].Line = gemsMatched.Count - gemsCount - 1;
 
                     gemsToMove.Add(gemsMatched[gemsCount]);
 
@@ -364,9 +364,12 @@ public class BoardManager : MonoBehaviour
         //TODO: make this work based on time
         float frac = 0.1f;
         Vector3 initPos = gem.transform.localPosition;
+        float animTime = 1f;
+        float timePassed = 0;
         while (frac <= 1)
         {
-            frac += 0.005f;
+            timePassed += 0.05f;
+            frac = timePassed/animTime;
             yield return new WaitForSeconds(0.005f);
             gem.transform.localPosition = Vector3.Lerp(initPos, GemPos[gem.Line, gem.Column], frac);
         }
