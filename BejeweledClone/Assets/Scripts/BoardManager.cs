@@ -195,7 +195,7 @@ public class BoardManager : MonoBehaviour
         //Check if there are any possible moves
         if(!CheckForPossibleMoves())
         {
-            //TODO: game over
+            GameManager.GameOverDelegate?.Invoke();
         }
 
         CanMove = true;
@@ -361,16 +361,15 @@ public class BoardManager : MonoBehaviour
         GemBoard[gem.Line, gem.Column] = gem;
 
         //Update position
-        //TODO: make this work based on time
         float frac = 0.1f;
         Vector3 initPos = gem.transform.localPosition;
-        float animTime = 1f;
+        float animTime = 0.2f;
         float timePassed = 0;
         while (frac <= 1)
         {
-            timePassed += 0.05f;
+            timePassed += 0.01f;
             frac = timePassed/animTime;
-            yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(0.01f);
             gem.transform.localPosition = Vector3.Lerp(initPos, GemPos[gem.Line, gem.Column], frac);
         }
     }

@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
 
     public delegate void OnPointsText(Vector3 pos, int points);
     public static OnPointsText PointsTextDelegate;
+
+    public delegate void OnGameOver();
+    public static OnGameOver GameOverDelegate;
     #endregion
 
     #region Variables
