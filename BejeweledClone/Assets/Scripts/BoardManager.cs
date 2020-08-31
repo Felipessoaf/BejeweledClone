@@ -129,8 +129,28 @@ public class BoardManager : MonoBehaviour
 
     private bool CheckForPossibleMoves()
     {
-        //TODO: implement this
-        Debug.LogWarning("not implemented");
+        for (int i = 0; i < lineMax; i++)
+        {
+            for (int j = 0; j < columnMax; j++)
+            {
+                //Check right
+                if(j < columnMax - 4 && CheckPossibleMove(i, j, i, j+1))
+                {
+                    return true;
+                }                 
+            }
+        }
+
+        return false;
+    }
+
+    private bool CheckPossibleMove(int line1, int column1, int line2, int column2)
+    {
+        //if (GemBoard[i, j].GemId == )
+        //{
+
+        //}
+
         return true;
     }
 
@@ -206,66 +226,16 @@ public class BoardManager : MonoBehaviour
         List<Gem> matchedGems = new List<Gem>();
         List<List<Gem>> matchCombos = new List<List<Gem>>();
 
-        //TODO: simplify line/column same code
-
         //Lines
         foreach (var line in linesToCheck)
         {
-            List<Gem> possibleMatch = new List<Gem>();
-            for (int i = 0; i < columnMax; i++)
-            {
-                Gem current = GemBoard[line, i];
-                Gem next = (i < columnMax - 1) ? GemBoard[line, i + 1] : null;
-
-                if (next && current.GemId == next.GemId)
-                {
-                    Utils.AddListElemIfNotExists(possibleMatch, current);
-                    Utils.AddListElemIfNotExists(possibleMatch, next);
-                }
-                else
-                {
-                    if (possibleMatch.Count >= 3)
-                    {
-                        foreach (var gem in possibleMatch)
-                        {
-                            Utils.AddListElemIfNotExists(matchedGems, gem);
-                        }
-                        //Store each match separately to count the points
-                        matchCombos.Add(possibleMatch.ToList());
-                    }
-                    possibleMatch.Clear();
-                }
-            }
+            CheckLineColumn(matchedGems, matchCombos, line, true);
         }
 
         //Columns
         foreach (var column in columnsToCheck)
         {
-            List<Gem> possibleMatch = new List<Gem>();
-            for (int i = lineMax - 1; i >= 0; i--)
-            {
-                Gem current = GemBoard[i, column];
-                Gem next = (i > 0) ? GemBoard[i - 1, column] : null;
-
-                if (next && current.GemId == next.GemId)
-                {
-                    Utils.AddListElemIfNotExists(possibleMatch, current);
-                    Utils.AddListElemIfNotExists(possibleMatch, next);
-                }
-                else
-                {
-                    if (possibleMatch.Count >= 3)
-                    {
-                        foreach (var gem in possibleMatch)
-                        {
-                            Utils.AddListElemIfNotExists(matchedGems, gem);
-                        }
-                        //Store each match separately to count the points
-                        matchCombos.Add(possibleMatch.ToList());
-                    }
-                    possibleMatch.Clear();
-                }
-            }
+            CheckLineColumn(matchedGems, matchCombos, column, false);
         }
 
         if (matchedGems.Count > 0)
@@ -275,6 +245,35 @@ public class BoardManager : MonoBehaviour
         }
 
         callback?.Invoke(matchedGems);
+    }
+
+    private void CheckLineColumn(List<Gem> matchedGems, List<List<Gem>> matchCombos, int index, bool line)
+    {
+        List<Gem> possibleMatch = new List<Gem>();
+        for (int i = 0; i < (line?columnMax:lineMax); i++)
+        {
+            Gem current = (line ? GemBoard[index, i] : GemBoard[i, index]);
+            Gem next = (line ? ((i < columnMax - 1) ? GemBoard[index, i + 1] : null) : ((i < lineMax - 1) ? GemBoard[i + 1, index] : null));
+
+            if (next && current.GemId == next.GemId)
+            {
+                Utils.AddListElemIfNotExists(possibleMatch, current);
+                Utils.AddListElemIfNotExists(possibleMatch, next);
+            }
+            else
+            {
+                if (possibleMatch.Count >= 3)
+                {
+                    foreach (var gem in possibleMatch)
+                    {
+                        Utils.AddListElemIfNotExists(matchedGems, gem);
+                    }
+                    //Store each match separately to count the points
+                    matchCombos.Add(possibleMatch.ToList());
+                }
+                possibleMatch.Clear();
+            }
+        }
     }
 
     private IEnumerator DestroyGems(List<Gem> matchedGems)
