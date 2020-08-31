@@ -5,6 +5,14 @@ using System.Linq;
 
 public class BoardManager : MonoBehaviour
 {
+    enum Direction
+    {
+        Down,
+        Up,
+        Left,
+        Right
+    }
+
     #region Variables
     [Header("References")]
     public GameObject GemPrefab;
@@ -123,7 +131,11 @@ public class BoardManager : MonoBehaviour
         if(CheckForPossibleMoves())
         {
             //Check Matches
-            StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
+            yield return StartCoroutine(CheckMatch(linesToCheck, columnsToCheck, true, null));
+        }
+        else
+        {
+            //TODO: gera board novo?
         }
     }
 
@@ -134,24 +146,128 @@ public class BoardManager : MonoBehaviour
             for (int j = 0; j < columnMax; j++)
             {
                 //Check right
-                if(j < columnMax - 4 && CheckPossibleMove(i, j, i, j+1))
+                if (j < columnMax - 3 && CheckPossibleMove(i, j, Direction.Right))
                 {
                     return true;
-                }                 
+                }
+
+                //Check left
+                if (j > 2 && CheckPossibleMove(i, j, Direction.Left))
+                {
+                    return true;
+                }
+
+                //Check up
+                if (i > 2 && CheckPossibleMove(i, j, Direction.Up))
+                {
+                    return true;
+                }
+
+                //Check down
+                if (i < lineMax - 3 && CheckPossibleMove(i, j, Direction.Down))
+                {
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
-    private bool CheckPossibleMove(int line1, int column1, int line2, int column2)
+    private bool CheckPossibleMove(int line, int column, Direction dir)
     {
-        //if (GemBoard[i, j].GemId == )
-        //{
+        int possibleMatchCount = 1;
+        int fromLine = line;
+        int fromColumn = column;
+        int gemId = GemBoard[line, column].GemId;
 
-        //}
+        switch (dir)
+        {
+            case Direction.Down:
+                fromLine += 2;
 
-        return true;
+                for (int i = fromLine; i < lineMax; i++)
+                {
+                    if (GemBoard[i, fromColumn].GemId == gemId)
+                    {
+                        possibleMatchCount++;
+                    }
+                    else
+                    {
+                        if (possibleMatchCount >= 3)
+                        {
+                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                            return true;
+                        }
+                        possibleMatchCount = 1;
+                    }
+                }
+                break;
+            case Direction.Up:
+                fromLine -= 2;
+
+                for (int i = fromLine; i >= 0; i--)
+                {
+                    if (GemBoard[i, fromColumn].GemId == gemId)
+                    {
+                        possibleMatchCount++;
+                    }
+                    else
+                    {
+                        if (possibleMatchCount >= 3)
+                        {
+                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                            return true;
+                        }
+                        possibleMatchCount = 1;
+                    }
+                }
+                break;
+            case Direction.Left:
+                fromColumn -= 2;
+
+                for (int i = fromColumn; i >= 0; i--)
+                {
+                    if (GemBoard[fromLine, i].GemId == gemId)
+                    {
+                        possibleMatchCount++;
+                    }
+                    else
+                    {
+                        if (possibleMatchCount >= 3)
+                        {
+                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                            return true;
+                        }
+                        possibleMatchCount = 1;
+                    }
+                }
+                break;
+            case Direction.Right:
+                fromColumn += 2;
+
+                for (int i = fromColumn; i < columnMax; i++)
+                {
+                    if (GemBoard[fromLine, i].GemId == gemId)
+                    {
+                        possibleMatchCount++;
+                    }
+                    else
+                    {
+                        if (possibleMatchCount >= 3)
+                        {
+                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                            return true;
+                        }
+                        possibleMatchCount = 1;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     public void CheckMove()

@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public delegate void OnPointsText(Vector3 pos, int points);
     public static OnPointsText PointsTextDelegate;
 
+    //TODO:player pref highscore?
     public delegate void OnGameOver();
     public static OnGameOver GameOverDelegate;
     #endregion
