@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     //TODO:player pref highscore?
     public delegate void OnGameOver();
     public static OnGameOver GameOverDelegate;
+
+    public delegate void OnStartMenu();
+    public static OnStartMenu StartMenuDelegate;
     #endregion
 
     #region Variables

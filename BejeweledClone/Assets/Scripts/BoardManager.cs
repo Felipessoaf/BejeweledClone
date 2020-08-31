@@ -135,7 +135,7 @@ public class BoardManager : MonoBehaviour
         }
         else
         {
-            //TODO: gera board novo?
+            StartCoroutine(GenerateBoard());
         }
     }
 
@@ -181,6 +181,7 @@ public class BoardManager : MonoBehaviour
         int fromColumn = column;
         int gemId = GemBoard[line, column].GemId;
 
+        //TODO: simplify code
         switch (dir)
         {
             case Direction.Down:
