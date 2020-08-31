@@ -199,7 +199,7 @@ public class BoardManager : MonoBehaviour
                             print("move possible: [" + line + ", " + column + "] " + dir.ToString());
                             return true;
                         }
-                        possibleMatchCount = 1;
+                        return false;
                     }
                 }
                 break;
@@ -219,7 +219,7 @@ public class BoardManager : MonoBehaviour
                             print("move possible: [" + line + ", " + column + "] " + dir.ToString());
                             return true;
                         }
-                        possibleMatchCount = 1;
+                        return false;
                     }
                 }
                 break;
@@ -239,7 +239,7 @@ public class BoardManager : MonoBehaviour
                             print("move possible: [" + line + ", " + column + "] " + dir.ToString());
                             return true;
                         }
-                        possibleMatchCount = 1;
+                        return false;
                     }
                 }
                 break;
@@ -259,7 +259,7 @@ public class BoardManager : MonoBehaviour
                             print("move possible: [" + line + ", " + column + "] " + dir.ToString());
                             return true;
                         }
-                        possibleMatchCount = 1;
+                        return false;
                     }
                 }
                 break;
