@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
     public delegate void OnPointsText(Vector3 pos, int points);
     public static OnPointsText PointsTextDelegate;
 
-    //TODO:player pref highscore?
     public delegate void OnGameOver();
     public static OnGameOver GameOverDelegate;
 
@@ -64,14 +63,21 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        GameManager.StartGameDelegate += SetupGame;
+        StartGameDelegate += SetupGame;
+        GameOverDelegate += OnGameEnd;
     }
 
     private void OnDisable()
     {
-        GameManager.StartGameDelegate -= SetupGame;
+        StartGameDelegate -= SetupGame;
+        GameOverDelegate -= OnGameEnd;
     }
     #endregion
+
+    private void OnGameEnd()
+    {
+        PlayerPrefs.SetInt("Highscore", Mathf.Max(score, PlayerPrefs.GetInt("Highscore")));
+    }
 
     private void SetupGame()
     {
