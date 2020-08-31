@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Variables
+    public TextAsset gameConfigJson;
+
     //Update score: gemComboPoints = base + base*gemsOver3 + comboIndex
     //base: how much one simple 3 match is worth based on current level
     //gemsOver3: total gems - 3, I.E. matches with more than 3 gems generates more points
@@ -73,12 +75,13 @@ public class GameManager : MonoBehaviour
 
     private void SetupGame()
     {
-        //TODO: make this a json?
-        baseMatchPoints = 10;
         score = 0;
         currentLevel = 1;
         previousLevelPoints = 0;
-        nextLevelPoints = 1000;
+
+        GameConfig gc = JsonUtility.FromJson<GameConfig>(gameConfigJson.ToString());
+        baseMatchPoints = gc.baseMatchPoints;
+        nextLevelPoints = gc.nextLevelPoints;
 
         ScoreUpdateDelegate?.Invoke(score, 0);
         ProgressUpdateDelegate?.Invoke(0);
