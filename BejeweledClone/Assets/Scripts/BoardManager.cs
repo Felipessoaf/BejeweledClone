@@ -241,42 +241,43 @@ public class BoardManager : MonoBehaviour
         //Switch gems temporarily
         SwitchGems(gem1, gem2);
 
-        //TODO: simplify code (duplicated)
-        //Lines
-        foreach (var l in linesToCheck)
+        //Check possible moves in each line/column
+        bool matchFound = false;
+        if(CheckPossibleMoveInList(linesToCheck, matchedGems, combos, true))
         {
-            CheckLineColumn(matchedGems, combos, l, true);
-            if(matchedGems.Count > 0)
+            matchFound = true;
+        }
+        else
+        {
+            if (CheckPossibleMoveInList(columnsToCheck, matchedGems, combos, false))
             {
-                print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-
-                //Switch gems back
-                SwitchGems(gem1, gem2);
-
-                return true;
+                matchFound = true;
             }
-            matchedGems.Clear();
-            combos.Clear();
         }
 
-        //Columns
-        foreach (var c in columnsToCheck)
+        if(matchFound)
         {
-            CheckLineColumn(matchedGems, combos, c, false);
-            if (matchedGems.Count > 0)
-            {
-                print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-
-                //Switch gems back
-                SwitchGems(gem1, gem2);
-                return true;
-            }
-            matchedGems.Clear();
-            combos.Clear();
+            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
         }
 
         //Switch gems back
         SwitchGems(gem1, gem2);
+
+        return matchFound;
+    }
+
+    private bool CheckPossibleMoveInList(List<int> list, List<Gem> matchedGems, List<List<Gem>> combos, bool isLine)
+    {
+        foreach (var l in list)
+        {
+            CheckLineColumn(matchedGems, combos, l, isLine, true);
+            if (matchedGems.Count > 0)
+            {
+                return true;
+            }
+            matchedGems.Clear();
+            combos.Clear();
+        }
 
         return false;
     }
