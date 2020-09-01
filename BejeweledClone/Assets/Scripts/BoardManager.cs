@@ -50,23 +50,15 @@ public class BoardManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.StartGameDelegate += SetupBoard;
-        GameManager.LevelUpdateDelegate += OnLevelUpdate;
         GameManager.PointsTextDelegate += OnPointsText;
     }
 
     private void OnDisable()
     {
         GameManager.StartGameDelegate -= SetupBoard;
-        GameManager.LevelUpdateDelegate -= OnLevelUpdate;
         GameManager.PointsTextDelegate -= OnPointsText;
     }
     #endregion
-
-    private void OnLevelUpdate(int level)
-    {
-        //TODO: some animation?
-        //SetupBoard();
-    }
 
     private void OnPointsText(Vector3 pos, int points)
     {
