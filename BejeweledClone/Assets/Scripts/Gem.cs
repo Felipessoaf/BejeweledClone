@@ -74,7 +74,6 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     public void DestroyGem()
     {
         //TODO: particles
-        //TODO: sound
         gameObject.SetActive(false);
     }
 

@@ -28,7 +28,10 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Variables
+    [Header("References")]
     public TextAsset gameConfigJson;
+
+    public AudioSource MatchSound;
 
     //Update score: gemComboPoints = base + base*gemsOver3 + comboIndex
     //base: how much one simple 3 match is worth based on current level
@@ -105,6 +108,8 @@ public class GameManager : MonoBehaviour
             comboScore += baseMatchPoints*(1 + (combos[i].Count-3) + i);
 
             PointsTextDelegate?.Invoke(combos[i][combos[i].Count / 2].transform.position, comboScore);
+
+            MatchSound.Play();
         }
 
         //Update score

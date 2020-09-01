@@ -142,7 +142,6 @@ public class BoardManager : MonoBehaviour
     private bool CheckForPossibleMoves()
     {
         print("CheckForPossibleMoves");
-        //return true;
         for (int i = 0; i < lineMax; i++)
         {
             for (int j = 0; j < columnMax; j++)
@@ -200,7 +199,6 @@ public class BoardManager : MonoBehaviour
         Gem gem1 = GemBoard[line, column];
         Gem gem2 = GemBoard[line, column];
 
-        //TODO: fix
         switch (dir)
         {
             case Direction.Down:
