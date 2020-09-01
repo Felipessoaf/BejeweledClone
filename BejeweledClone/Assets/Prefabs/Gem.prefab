@@ -205,5 +205,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 84c45e2cf7a25455fb600a0ac618f5f6, type: 3}
   - {fileID: 21300000, guid: b16d1b72b5d0e47f7b08c03f0019b278, type: 3}
   SelectionBorder: {fileID: 1695159890170493680}
+  ExplosionParticle: {fileID: 7324639597336022873, guid: 55dff1bd6f724004595905684537447c,
+    type: 3}
   Line: 0
   Column: 0

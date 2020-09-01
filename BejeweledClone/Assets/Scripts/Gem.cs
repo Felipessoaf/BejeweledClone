@@ -11,6 +11,8 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     public Sprite[] Sprites;
     public GameObject SelectionBorder;
 
+    public GameObject ExplosionParticle;
+
     public static Gem DraggedGem;
     public static Gem DropOnGem;
 
@@ -73,7 +75,7 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
 
     public void DestroyGem()
     {
-        //TODO: particles
+        Instantiate(ExplosionParticle, transform.position, ExplosionParticle.transform.rotation, transform.parent);
         gameObject.SetActive(false);
     }
 
