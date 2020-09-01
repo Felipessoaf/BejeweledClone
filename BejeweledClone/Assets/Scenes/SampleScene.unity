@@ -798,7 +798,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &529249895
 RectTransform:
   m_ObjectHideFlags: 0
@@ -845,6 +845,7 @@ GameObject:
   - component: {fileID: 748277966}
   - component: {fileID: 748277965}
   - component: {fileID: 748277964}
+  - component: {fileID: 748277968}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -935,6 +936,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &748277968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748277963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c16a45ab512d6a4419774b97ee0a21b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MenuScreen: {fileID: 1956387215}
+  GameScreen: {fileID: 265201020}
+  GameOverScreen: {fileID: 529249894}
 --- !u!224 &992934749 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2992129639299706584, guid: e1c77c55f1f361640a0802974663865c,
@@ -1387,7 +1403,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1956387216
 RectTransform:
   m_ObjectHideFlags: 0
