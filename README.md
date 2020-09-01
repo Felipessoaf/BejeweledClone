@@ -9,3 +9,5 @@ https://assetstore.unity.com/packages/2d/textures-materials/2d-free-crystal-set-
 https://assetstore.unity.com/packages/2d/gui/icons/game-gui-buttons-96277
 
 https://assetstore.unity.com/packages/audio/music/free-music-tracks-for-games-156413
+
+https://assetstore.unity.com/packages/audio/sound-fx/free-casual-game-sfx-pack-54116
