@@ -176,96 +176,127 @@ public class BoardManager : MonoBehaviour
 
     private bool CheckPossibleMove(int line, int column, Direction dir)
     {
-        int possibleMatchCount = 1;
-        int fromLine = line;
-        int fromColumn = column;
-        int gemId = GemBoard[line, column].GemId;
+        List<int> linesToCheck = new List<int>();
+        List<int> columnsToCheck = new List<int>();
+        List<Gem> matchedGems = new List<Gem>();
+        List<List<Gem>> combos = new List<List<Gem>>();
+        return true;
 
-        //TODO: simplify code
+        //TODO: simplify code & check remaining cases
         switch (dir)
         {
             case Direction.Down:
-                fromLine += 2;
+                //Gem temp = GemBoard[line, column];
+                //GemBoard[line, column] = GemBoard[line + 1, column];
+                //GemBoard[line + 1, column] = temp;
 
-                for (int i = fromLine; i < lineMax; i++)
-                {
-                    if (GemBoard[i, fromColumn].GemId == gemId)
-                    {
-                        possibleMatchCount++;
-                    }
-                    else
-                    {
-                        if (possibleMatchCount >= 3)
-                        {
-                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                            return true;
-                        }
-                        return false;
-                    }
-                }
-                break;
+                ////Add lines
+                //Utils.AddListElemIfNotExists(linesToCheck, Gem.DraggedGem.Line);
+                //Utils.AddListElemIfNotExists(linesToCheck, Gem.DropOnGem.Line);
+
+                ////Add columns
+                //Utils.AddListElemIfNotExists(columnsToCheck, column); 
+
+                ////Check column
+                //CheckLineColumn(matchedGems, new List<List<Gem>>(), column, false, true);
+                //if(matchedGems.Count > 0)
+                //{
+                //    return true;
+                //}
+
+                ////Check lines
+                //CheckLineColumn(new List<Gem>(), new List<List<Gem>>(), line, true, true);
+                //CheckLineColumn(new List<Gem>(), new List<List<Gem>>(), line + 1, true, true);
+
+                return false;
             case Direction.Up:
-                fromLine -= 2;
+                //fromLine -= 2;
 
-                for (int i = fromLine; i >= 0; i--)
-                {
-                    if (GemBoard[i, fromColumn].GemId == gemId)
-                    {
-                        possibleMatchCount++;
-                    }
-                    else
-                    {
-                        if (possibleMatchCount >= 3)
-                        {
-                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                            return true;
-                        }
-                        return false;
-                    }
-                }
+                //for (int i = fromLine; i >= 0; i--)
+                //{
+                //    if (GemBoard[i, fromColumn].GemId == gemId)
+                //    {
+                //        possibleMatchCount++;
+                //    }
+                //    else
+                //    {
+                //        if (possibleMatchCount >= 3)
+                //        {
+                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                //            return true;
+                //        }
+                //        return false;
+                //    }
+                //}
                 break;
             case Direction.Left:
-                fromColumn -= 2;
+                //fromColumn -= 2;
 
-                for (int i = fromColumn; i >= 0; i--)
-                {
-                    if (GemBoard[fromLine, i].GemId == gemId)
-                    {
-                        possibleMatchCount++;
-                    }
-                    else
-                    {
-                        if (possibleMatchCount >= 3)
-                        {
-                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                            return true;
-                        }
-                        return false;
-                    }
-                }
+                //for (int i = fromColumn; i >= 0; i--)
+                //{
+                //    if (GemBoard[fromLine, i].GemId == gemId)
+                //    {
+                //        possibleMatchCount++;
+                //    }
+                //    else
+                //    {
+                //        if (possibleMatchCount >= 3)
+                //        {
+                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                //            return true;
+                //        }
+                //        return false;
+                //    }
+                //}
                 break;
             case Direction.Right:
-                fromColumn += 2;
+                //fromColumn += 2;
 
-                for (int i = fromColumn; i < columnMax; i++)
-                {
-                    if (GemBoard[fromLine, i].GemId == gemId)
-                    {
-                        possibleMatchCount++;
-                    }
-                    else
-                    {
-                        if (possibleMatchCount >= 3)
-                        {
-                            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                            return true;
-                        }
-                        return false;
-                    }
-                }
+                //for (int i = fromColumn; i < columnMax; i++)
+                //{
+                //    if (GemBoard[fromLine, i].GemId == gemId)
+                //    {
+                //        possibleMatchCount++;
+                //    }
+                //    else
+                //    {
+                //        if (possibleMatchCount >= 3)
+                //        {
+                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                //            return true;
+                //        }
+                //        return false;
+                //    }
+                //}
                 break;
             default:
                 break;
+        }
+
+        //Lines
+        foreach (var l in linesToCheck)
+        {
+            CheckLineColumn(matchedGems, combos, l, true);
+            if(matchedGems.Count > 0)
+            {
+                print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                return true;
+            }
+            matchedGems.Clear();
+            combos.Clear();
+        }
+
+        //Columns
+        foreach (var c in columnsToCheck)
+        {
+            CheckLineColumn(matchedGems, combos, c, false);
+            if (matchedGems.Count > 0)
+            {
+                print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+                return true;
+            }
+            matchedGems.Clear();
+            combos.Clear();
         }
 
         return false;
@@ -364,7 +395,7 @@ public class BoardManager : MonoBehaviour
         callback?.Invoke(matchedGems);
     }
 
-    private void CheckLineColumn(List<Gem> matchedGems, List<List<Gem>> matchCombos, int index, bool line)
+    private void CheckLineColumn(List<Gem> matchedGems, List<List<Gem>> matchCombos, int index, bool line, bool stopAtFirst = false)
     {
         List<Gem> possibleMatch = new List<Gem>();
         for (int i = 0; i < (line?columnMax:lineMax); i++)
@@ -387,6 +418,11 @@ public class BoardManager : MonoBehaviour
                     }
                     //Store each match separately to count the points
                     matchCombos.Add(possibleMatch.ToList());
+
+                    if(stopAtFirst)
+                    {
+                        return;
+                    }
                 }
                 possibleMatch.Clear();
             }
@@ -400,7 +436,7 @@ public class BoardManager : MonoBehaviour
 
         foreach (var gem in matchedGems)
         {
-            gem.gameObject.SetActive(false);
+            gem.DestroyGem();
             
             if(!gemsPerColumn.ContainsKey(gem.Column))
             {

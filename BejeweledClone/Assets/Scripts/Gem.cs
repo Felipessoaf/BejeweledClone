@@ -71,6 +71,13 @@ public class Gem : MonoBehaviour, IBeginDragHandler, IDropHandler, IDragHandler,
     }
     #endregion
 
+    public void DestroyGem()
+    {
+        //TODO: particles
+        //TODO: sound
+        gameObject.SetActive(false);
+    }
+
     #region OtherHandlers
     public void OnEndDrag(PointerEventData eventData)
     {

@@ -16,6 +16,8 @@ public class ScreenManager : MonoBehaviour
         MenuScreen.SetActive(true);
         GameScreen.SetActive(true);
         GameOverScreen.SetActive(true);
+
+        StartCoroutine(DeactivateScreens());
     }
 
     IEnumerator DeactivateScreens()
