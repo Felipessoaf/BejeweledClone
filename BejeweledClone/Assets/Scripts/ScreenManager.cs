@@ -23,7 +23,6 @@ public class ScreenManager : MonoBehaviour
     IEnumerator DeactivateScreens()
     {
         yield return new WaitForEndOfFrame();
-        GameScreen.SetActive(false);
         GameOverScreen.SetActive(false);
     }
 }

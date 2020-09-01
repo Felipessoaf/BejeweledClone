@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class GameOverScreen : MonoBehaviour
@@ -8,6 +9,7 @@ public class GameOverScreen : MonoBehaviour
     #region Variables
     [Header("References")]
     public TMP_Text HighscoreText;
+    public Button RestartButton;
 
     #endregion
 
@@ -15,15 +17,13 @@ public class GameOverScreen : MonoBehaviour
     {
         gameObject.SetActive(false);
         GameManager.GameOverDelegate += Show;
+        RestartButton.onClick.AddListener(StartGame);
     }
 
-    void Update()
+    private void StartGame()
     {
-        if (Input.anyKeyDown)
-        {
-            GameManager.StartMenuDelegate?.Invoke();
-            gameObject.SetActive(false);
-        }
+        GameManager.StartMenuDelegate?.Invoke();
+        gameObject.SetActive(false);
     }
 
     private void OnDestroy()

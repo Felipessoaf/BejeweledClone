@@ -67,15 +67,28 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         StartGameDelegate += SetupGame;
+        StartMenuDelegate += SetupGame;
         GameOverDelegate += OnGameEnd;
     }
 
     private void OnDisable()
     {
         StartGameDelegate -= SetupGame;
+        StartMenuDelegate -= SetupGame;
         GameOverDelegate -= OnGameEnd;
     }
     #endregion
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        //For testing purposes
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            GameOverDelegate?.Invoke();
+        }
+    }
+#endif
 
     private void OnGameEnd()
     {
@@ -94,6 +107,7 @@ public class GameManager : MonoBehaviour
 
         ScoreUpdateDelegate?.Invoke(score, 0);
         ProgressUpdateDelegate?.Invoke(0);
+        LevelUpdateDelegate?.Invoke(currentLevel);
     }
 
     public void AddScore(List<List<Gem>> combos)
