@@ -19,7 +19,7 @@ public class SideMenu : MonoBehaviour
     void Start()
     {
         NewGameButton.onClick.AddListener(StartGame);
-        NewGameButton.onClick.AddListener(QuitGame);
+        QuitGameButton.onClick.AddListener(QuitGame);
     }
 
     private void OnEnable()
