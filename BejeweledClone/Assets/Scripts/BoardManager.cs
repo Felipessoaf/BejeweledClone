@@ -141,6 +141,8 @@ public class BoardManager : MonoBehaviour
 
     private bool CheckForPossibleMoves()
     {
+        print("CheckForPossibleMoves");
+        return true;
         for (int i = 0; i < lineMax; i++)
         {
             for (int j = 0; j < columnMax; j++)
@@ -180,99 +182,74 @@ public class BoardManager : MonoBehaviour
         List<int> columnsToCheck = new List<int>();
         List<Gem> matchedGems = new List<Gem>();
         List<List<Gem>> combos = new List<List<Gem>>();
-        return true;
+
+        Gem gem1 = GemBoard[line, column];
+        Gem gem2 = GemBoard[line, column];
 
         //TODO: simplify code & check remaining cases
         switch (dir)
         {
             case Direction.Down:
-                //Gem temp = GemBoard[line, column];
-                //GemBoard[line, column] = GemBoard[line + 1, column];
-                //GemBoard[line + 1, column] = temp;
+                gem2 = GemBoard[line + 1, column];
 
-                ////Add lines
-                //Utils.AddListElemIfNotExists(linesToCheck, Gem.DraggedGem.Line);
-                //Utils.AddListElemIfNotExists(linesToCheck, Gem.DropOnGem.Line);
+                //Add lines
+                Utils.AddListElemIfNotExists(linesToCheck, line);
+                Utils.AddListElemIfNotExists(linesToCheck, line + 1);
 
-                ////Add columns
-                //Utils.AddListElemIfNotExists(columnsToCheck, column); 
+                //Add columns
+                Utils.AddListElemIfNotExists(columnsToCheck, column);
 
-                ////Check column
-                //CheckLineColumn(matchedGems, new List<List<Gem>>(), column, false, true);
-                //if(matchedGems.Count > 0)
-                //{
-                //    return true;
-                //}
-
-                ////Check lines
-                //CheckLineColumn(new List<Gem>(), new List<List<Gem>>(), line, true, true);
-                //CheckLineColumn(new List<Gem>(), new List<List<Gem>>(), line + 1, true, true);
-
-                return false;
+                break;
             case Direction.Up:
-                //fromLine -= 2;
+                gem2 = GemBoard[line - 1, column];
 
-                //for (int i = fromLine; i >= 0; i--)
-                //{
-                //    if (GemBoard[i, fromColumn].GemId == gemId)
-                //    {
-                //        possibleMatchCount++;
-                //    }
-                //    else
-                //    {
-                //        if (possibleMatchCount >= 3)
-                //        {
-                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                //            return true;
-                //        }
-                //        return false;
-                //    }
-                //}
+                //Add lines
+                Utils.AddListElemIfNotExists(linesToCheck, line);
+                Utils.AddListElemIfNotExists(linesToCheck, line - 1);
+
+                //Add columns
+                Utils.AddListElemIfNotExists(columnsToCheck, column);
                 break;
             case Direction.Left:
-                //fromColumn -= 2;
+                gem2 = GemBoard[line, column - 1];
 
-                //for (int i = fromColumn; i >= 0; i--)
-                //{
-                //    if (GemBoard[fromLine, i].GemId == gemId)
-                //    {
-                //        possibleMatchCount++;
-                //    }
-                //    else
-                //    {
-                //        if (possibleMatchCount >= 3)
-                //        {
-                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                //            return true;
-                //        }
-                //        return false;
-                //    }
-                //}
+                //Add lines
+                Utils.AddListElemIfNotExists(linesToCheck, line);
+
+                //Add columns
+                Utils.AddListElemIfNotExists(columnsToCheck, column);
+                Utils.AddListElemIfNotExists(columnsToCheck, column - 1);
                 break;
             case Direction.Right:
-                //fromColumn += 2;
+                gem2 = GemBoard[line, column + 1];
 
-                //for (int i = fromColumn; i < columnMax; i++)
-                //{
-                //    if (GemBoard[fromLine, i].GemId == gemId)
-                //    {
-                //        possibleMatchCount++;
-                //    }
-                //    else
-                //    {
-                //        if (possibleMatchCount >= 3)
-                //        {
-                //            print("move possible: [" + line + ", " + column + "] " + dir.ToString());
-                //            return true;
-                //        }
-                //        return false;
-                //    }
-                //}
+                //Add lines
+                Utils.AddListElemIfNotExists(linesToCheck, line);
+
+                //Add columns
+                Utils.AddListElemIfNotExists(columnsToCheck, column);
+                Utils.AddListElemIfNotExists(columnsToCheck, column + 1);
                 break;
             default:
                 break;
         }
 
+        //Switch gems temporarily
+        Gem temp = GemBoard[gem1.Line, gem1.Column];
+        GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+        GemBoard[gem2.Line, gem2.Column] = temp;
+
+        //int tempLine = gem1.Line;
+        //int tempColumn = gem1.Column;
+
+        ////gem1->gem2
+        //GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+        //gem1.Line = gem2.Line;
+        //gem1.Column = gem2.Column;
+
+        //GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+
+        //TODO: simplify code (duplicated)
         //Lines
         foreach (var l in linesToCheck)
         {
@@ -280,6 +257,12 @@ public class BoardManager : MonoBehaviour
             if(matchedGems.Count > 0)
             {
                 print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+
+                //Switch gems back
+                temp = GemBoard[gem1.Line, gem1.Column];
+                GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+                GemBoard[gem2.Line, gem2.Column] = temp;
+
                 return true;
             }
             matchedGems.Clear();
@@ -293,6 +276,11 @@ public class BoardManager : MonoBehaviour
             if (matchedGems.Count > 0)
             {
                 print("move possible: [" + line + ", " + column + "] " + dir.ToString());
+
+                //Switch gems back
+                temp = GemBoard[gem1.Line, gem1.Column];
+                GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+                GemBoard[gem2.Line, gem2.Column] = temp;
                 return true;
             }
             matchedGems.Clear();
