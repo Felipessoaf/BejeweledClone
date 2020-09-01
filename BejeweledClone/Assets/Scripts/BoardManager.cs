@@ -142,31 +142,31 @@ public class BoardManager : MonoBehaviour
     private bool CheckForPossibleMoves()
     {
         print("CheckForPossibleMoves");
-        return true;
+        //return true;
         for (int i = 0; i < lineMax; i++)
         {
             for (int j = 0; j < columnMax; j++)
             {
                 //Check right
-                if (j < columnMax - 3 && CheckPossibleMove(i, j, Direction.Right))
+                if (j < columnMax - 1 && CheckPossibleMove(i, j, Direction.Right))
                 {
                     return true;
                 }
 
                 //Check left
-                if (j > 2 && CheckPossibleMove(i, j, Direction.Left))
+                if (j > 0 && CheckPossibleMove(i, j, Direction.Left))
                 {
                     return true;
                 }
 
                 //Check up
-                if (i > 2 && CheckPossibleMove(i, j, Direction.Up))
+                if (i > 0 && CheckPossibleMove(i, j, Direction.Up))
                 {
                     return true;
                 }
 
                 //Check down
-                if (i < lineMax - 3 && CheckPossibleMove(i, j, Direction.Down))
+                if (i < lineMax - 1 && CheckPossibleMove(i, j, Direction.Down))
                 {
                     return true;
                 }
@@ -174,6 +174,20 @@ public class BoardManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void SwitchGems(Gem gem1, Gem gem2)
+    {
+        int tempLine = gem1.Line;
+        int tempColumn = gem1.Column;
+
+        GemBoard[gem1.Line, gem1.Column] = gem2;
+        gem1.Line = gem2.Line;
+        gem1.Column = gem2.Column;
+
+        GemBoard[gem2.Line, gem2.Column] = gem1;
+        gem2.Line = tempLine;
+        gem2.Column = tempColumn;
     }
 
     private bool CheckPossibleMove(int line, int column, Direction dir)
@@ -186,7 +200,7 @@ public class BoardManager : MonoBehaviour
         Gem gem1 = GemBoard[line, column];
         Gem gem2 = GemBoard[line, column];
 
-        //TODO: simplify code & check remaining cases
+        //TODO: fix
         switch (dir)
         {
             case Direction.Down:
@@ -235,19 +249,7 @@ public class BoardManager : MonoBehaviour
         }
 
         //Switch gems temporarily
-        Gem temp = GemBoard[gem1.Line, gem1.Column];
-        GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
-        GemBoard[gem2.Line, gem2.Column] = temp;
-
-        //int tempLine = gem1.Line;
-        //int tempColumn = gem1.Column;
-
-        ////gem1->gem2
-        //GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
-        //gem1.Line = gem2.Line;
-        //gem1.Column = gem2.Column;
-
-        //GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
+        SwitchGems(gem1, gem2);
 
         //TODO: simplify code (duplicated)
         //Lines
@@ -259,9 +261,7 @@ public class BoardManager : MonoBehaviour
                 print("move possible: [" + line + ", " + column + "] " + dir.ToString());
 
                 //Switch gems back
-                temp = GemBoard[gem1.Line, gem1.Column];
-                GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
-                GemBoard[gem2.Line, gem2.Column] = temp;
+                SwitchGems(gem1, gem2);
 
                 return true;
             }
@@ -278,14 +278,15 @@ public class BoardManager : MonoBehaviour
                 print("move possible: [" + line + ", " + column + "] " + dir.ToString());
 
                 //Switch gems back
-                temp = GemBoard[gem1.Line, gem1.Column];
-                GemBoard[gem1.Line, gem1.Column] = GemBoard[gem2.Line, gem2.Column];
-                GemBoard[gem2.Line, gem2.Column] = temp;
+                SwitchGems(gem1, gem2);
                 return true;
             }
             matchedGems.Clear();
             combos.Clear();
         }
+
+        //Switch gems back
+        SwitchGems(gem1, gem2);
 
         return false;
     }
